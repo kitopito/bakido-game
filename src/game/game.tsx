@@ -249,7 +249,7 @@ export class GameScene extends Phaser.Scene {
 //      console.log(this.currentFish.x);
 //      console.log(this.currentFish.width);
 //      console.log(this.currentFish.originX);
-      fishPhaseMap.set(this.currentFish, rand);
+      fishPhaseMap.set(this.nextFish, rand);
     }
   }
 
