@@ -59,7 +59,8 @@ function GameComponent() {
     <div id="phaser-game" className={isReady ? "visible" : "invisible"} />
     </Center>
 
-    <Grid templateColumns='repeat(5, 1fr)' gap={4}>
+    <Grid templateColumns='repeat(7, 1fr)' gap={4}>
+    <GridItem colSpan={1} textAlign={"center"}></GridItem>
     <GridItem colSpan={1} textAlign={"center"}></GridItem>
 
     <GridItem colSpan={1} textAlign={"center"}>
@@ -88,6 +89,7 @@ function GameComponent() {
     }}>right</Button>
     </GridItem>
 
+    <GridItem colSpan={1} textAlign={"center"}></GridItem>
     <GridItem colSpan={1} textAlign={"center"}></GridItem>
     </Grid>
     </Container> </>

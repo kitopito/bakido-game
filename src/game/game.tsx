@@ -1,6 +1,6 @@
 import Phaser, { GameObjects } from "phaser";
+import { images } from "./images";
 
-//var ball: Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
 var paddle: Phaser.Physics.Matter.Image;
 const fishPhaseMap = new Map<Phaser.Physics.Matter.Image, number>();
 
@@ -19,28 +19,28 @@ export class GameScene extends Phaser.Scene {
 
   private items?: Phaser.GameObjects.Group;
   private fishY: number = 150;
+  private nextCircleX: number = 600;
   
   private currentFish?: Phaser.Physics.Matter.Image;
-  private nextFish?: Phaser.GameObjects.Sprite;
+  private nextFish?: Phaser.Physics.Matter.Image;
+//  private nextFish?: Phaser.GameObjects.Sprite;
   
   private isKeyboardEnable = true;
+  
+  private canvas?: HTMLCanvasElement;
 
   preload() {
+    this.canvas = this.sys.game.canvas;
+
     this.load.image('sky', '/graph.png');
     this.load.image('logo', '/obake.png');
 
 //    this.load.image('ball', '/vite.svg');
     this.load.image('paddle', '/koumori.png');
 
-    this.load.image('candy', '/candy.png');
-    this.load.image('castle', '/castle.png');
-    this.load.image('cat', '/cat.png');
-    this.load.image('gaikotsu', '/gaikotsu.png');
-    this.load.image('majo', '/majo.png');
-    this.load.image('moon', '/moon.png');
-    this.load.image('obake', '/obake.png');
-    this.load.image('pumpkin', '/pumpkin.png');
-    this.load.image('vite', '/vite.svg');
+    for(let i=0;i<9;i++) {
+      this.load.image(images[i].key, '/'+images[i].fileName);
+    }
   }
 
   create() {
@@ -108,9 +108,20 @@ export class GameScene extends Phaser.Scene {
     firstFish.setCollisionGroup(-1); // no collision
     firstFish.setCollidesWith(0);
     firstFish.setBounce(0.5);
-
     this.currentFish = firstFish;
-    fishPhaseMap.set(firstFish, 0);
+
+    const rand: number = getRandomInt(0, 4);
+    this.nextFish = this.createFish(rand);
+    this.nextFish.setIgnoreGravity(true);
+    this.nextFish.setPosition(
+      this.nextCircleX,//+ paddle.displayWidth/2 - firstFish.displayWidth/2 - firstFish.width/2,
+      this.fishY
+    );
+    this.nextFish.setStatic(true);
+    this.nextFish.setCollisionGroup(-1); // no collision
+    this.nextFish.setCollidesWith(0);
+    this.nextFish.setBounce(0.5);
+    fishPhaseMap.set(this.nextFish, 0);
        
     this.matter.world.on("collisionstart", (event: Phaser.Physics.Matter.Events.CollisionStartEvent) => {
       event.pairs.forEach(pair => {
@@ -187,17 +198,22 @@ export class GameScene extends Phaser.Scene {
 //    this.physics.collide(ball, paddle)
     if((this.KeyLeft?.isDown || this.isLeftButtonPressed) && this.isKeyboardEnable) {
       console.log("←押された");
-      paddle.x += -5;
-//      this.currentFish!.x += -5;
-      this.currentFish!.x = paddle.x;
+      if(paddle.x - 5 > 0) {
+        paddle.x += -5;
+  //      this.currentFish!.x += -5;
+        this.currentFish!.x = paddle.x;
+      }
       console.log(paddle.x);
       console.log(this.currentFish!.x);
     }
+
     if((this.KeyRight?.isDown || this.isRightButtonPressed) && this.isKeyboardEnable) {
       console.log("→押された");
-      paddle.x += +5;
-//      this.currentFish!.x += +5;
-      this.currentFish!.x = paddle.x;
+      if(paddle.x + 5 < this.canvas!.width) {
+        paddle.x += +5;
+  //      this.currentFish!.x += +5;
+        this.currentFish!.x = paddle.x;
+      }
       console.log(paddle.x);
       console.log(this.currentFish!.x);
 //      paddle.setPosition(paddle.x+5, paddle.y);
@@ -211,18 +227,23 @@ export class GameScene extends Phaser.Scene {
       this.currentFish?.setCollidesWith(-1); // enable collision
 
       const rand: number = getRandomInt(0, 4);
-      this.currentFish = this.createFish(rand);
+      this.currentFish = this.nextFish;
+      this.currentFish?.setPosition(
+        paddle.x,//+ paddle.displayWidth/2 - firstFish.displayWidth/2 - firstFish.width/2,
+        this.fishY
+      );
+      this.nextFish = this.createFish(rand);
 //      this.currentFish.setPosition(0,0);
 //      this.currentFish.setOrigin(0);
-      this.currentFish.setPosition(
-        paddle.x ,//+ paddle.displayWidth/2 - this.currentFish.width/2 - this.currentFish.displayWidth/2,
+      this.nextFish.setPosition(
+        this.nextCircleX,//+ paddle.displayWidth/2 - this.currentFish.width/2 - this.currentFish.displayWidth/2,
 //        0,
 //        paddle.y - newBall.height - newBall.displayHeight/2
         this.fishY
       );
-      this.currentFish.setStatic(true);
-      this.currentFish?.setCollisionGroup(-1);
-      this.currentFish.setCollidesWith(0);
+      this.nextFish.setStatic(true);
+      this.nextFish?.setCollisionGroup(-1);
+      this.nextFish.setCollidesWith(0);
 
 //      console.log("魚座標");
 //      console.log(this.currentFish.x);
@@ -236,6 +257,10 @@ export class GameScene extends Phaser.Scene {
     let status: string = '';
     let scale: number = 1;
     let newFish;
+
+    status = images[phase].key;
+    scale = images[phase].scale;
+    /*
     switch (phase) {
       case 0: status = 'vite'; scale = 0.5; break;
       case 1: status = 'candy'; scale = 0.15; break;
@@ -248,6 +273,7 @@ export class GameScene extends Phaser.Scene {
       case 8: status = 'pumpkin'; scale = 0.8; break;
       default: status = 'logo';
     }
+    */
 //    console.log("コウモリ座標");
 //    console.log(paddle.x);
 //    console.log(paddle.y);
