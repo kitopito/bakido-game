@@ -1,5 +1,6 @@
 import Phaser, { GameObjects } from "phaser";
 import { images } from "./images";
+import { $isGameOvered, $score } from "../state/state";
 
 var paddle: Phaser.Physics.Matter.Image;
 const fishPhaseMap = new Map<Phaser.Physics.Matter.Image, number>();
@@ -15,11 +16,11 @@ export class GameScene extends Phaser.Scene {
 
   private maxPhase: number = 8;
   private scoreText?: Phaser.GameObjects.Text; 
-  private score = 0; 
 
   private items?: Phaser.GameObjects.Group;
   private fishY: number = 150;
-  private nextCircleX: number = 600;
+  private nextCircleX: number = 750;
+  private nextCircleY: number = 50;
   
   private currentFish?: Phaser.Physics.Matter.Image;
   private nextFish?: Phaser.Physics.Matter.Image;
@@ -84,6 +85,9 @@ export class GameScene extends Phaser.Scene {
 
     this.scoreText = this.add.text(
       10, 16, 'Score: 0', { fontSize: '32px', color: '#000000'});
+    $score.subscribe(score => {
+      this.scoreText?.setText('Score: ' + score);
+    })
 
     paddle = this.matter.add.image(
 //      canvas.width / 2, 60, "paddle");
@@ -109,19 +113,20 @@ export class GameScene extends Phaser.Scene {
     firstFish.setCollidesWith(0);
     firstFish.setBounce(0.5);
     this.currentFish = firstFish;
+    fishPhaseMap.set(firstFish, 0);
 
     const rand: number = getRandomInt(0, 4);
     this.nextFish = this.createFish(rand);
     this.nextFish.setIgnoreGravity(true);
     this.nextFish.setPosition(
       this.nextCircleX,//+ paddle.displayWidth/2 - firstFish.displayWidth/2 - firstFish.width/2,
-      this.fishY
+      this.nextCircleY
     );
     this.nextFish.setStatic(true);
     this.nextFish.setCollisionGroup(-1); // no collision
     this.nextFish.setCollidesWith(0);
     this.nextFish.setBounce(0.5);
-    fishPhaseMap.set(this.nextFish, 0);
+    fishPhaseMap.set(this.nextFish, rand);
        
     this.matter.world.on("collisionstart", (event: Phaser.Physics.Matter.Events.CollisionStartEvent) => {
       event.pairs.forEach(pair => {
@@ -143,10 +148,12 @@ export class GameScene extends Phaser.Scene {
             
         const isSensor = rootBodyA.isSensor || rootBodyB.isSensor;
         if(isSensor) {
+          // Game Over
 //          console.log("Sensor当たったナリ");
           this.matter.world.pause();
-          this.scoreText?.setText('Game Over Score: ' + this.score);
+          this.scoreText?.setText('Game Over Score: ' + $score);
           this.isKeyboardEnable = false;
+          $isGameOvered.set(true);
         }
 
 //        console.log("魚判定");
@@ -183,8 +190,11 @@ export class GameScene extends Phaser.Scene {
               fishPhaseMap.set(newFish, phase + 1);
             }
 
-            this.score += Math.pow(2, phase);
-            this.scoreText?.setText('Score: ' + this.score);
+            console.log("スコア足す前");
+            console.log($score.get());
+            $score.set($score.get() + Math.pow(2, phase));
+            console.log("スコア足す後");
+            console.log($score.get());
           }
         }
       })
@@ -197,25 +207,25 @@ export class GameScene extends Phaser.Scene {
   update(): void {
 //    this.physics.collide(ball, paddle)
     if((this.KeyLeft?.isDown || this.isLeftButtonPressed) && this.isKeyboardEnable) {
-      console.log("←押された");
+//      console.log("←押された");
       if(paddle.x - 5 > 0) {
         paddle.x += -5;
   //      this.currentFish!.x += -5;
         this.currentFish!.x = paddle.x;
       }
-      console.log(paddle.x);
-      console.log(this.currentFish!.x);
+//      console.log(paddle.x);
+//      console.log(this.currentFish!.x);
     }
 
     if((this.KeyRight?.isDown || this.isRightButtonPressed) && this.isKeyboardEnable) {
-      console.log("→押された");
+//      console.log("→押された");
       if(paddle.x + 5 < this.canvas!.width) {
         paddle.x += +5;
   //      this.currentFish!.x += +5;
         this.currentFish!.x = paddle.x;
       }
-      console.log(paddle.x);
-      console.log(this.currentFish!.x);
+//      console.log(paddle.x);
+//      console.log(this.currentFish!.x);
 //      paddle.setPosition(paddle.x+5, paddle.y);
     }
     if((Phaser.Input.Keyboard.JustDown(this.KeySpace!) || this.isFallButtonPressed) && this.isKeyboardEnable) {
@@ -239,7 +249,7 @@ export class GameScene extends Phaser.Scene {
         this.nextCircleX,//+ paddle.displayWidth/2 - this.currentFish.width/2 - this.currentFish.displayWidth/2,
 //        0,
 //        paddle.y - newBall.height - newBall.displayHeight/2
-        this.fishY
+        this.nextCircleY
       );
       this.nextFish.setStatic(true);
       this.nextFish?.setCollisionGroup(-1);

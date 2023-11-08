@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from 'react'
 import { GameScene, gameConfig } from './game/game'
-import { Button, Center, Container, Flex, Grid, GridItem, Spacer } from '@chakra-ui/react';
+import { Button, Center, Container, Flex, Grid, GridItem, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Spacer, useDisclosure } from '@chakra-ui/react';
+import { $isGameOvered, $score } from './state/state';
+import { useStore } from '@nanostores/react'
 
 function GameComponent() {
   const [isReady, setReady] = useState(false);
   const [screenWidth, setScreenWidth] = useState(400);
   const [screenHeight, setScreenHeight] = useState(400);
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const isGameOvered = useStore($isGameOvered);
 
   const sw = document.body.clientWidth;
 //  const sw = document.documentElement.clientWidth;
@@ -64,7 +69,7 @@ function GameComponent() {
     <GridItem colSpan={1} textAlign={"center"}></GridItem>
 
     <GridItem colSpan={1} textAlign={"center"}>
-    <Button onMouseDown={()=>{
+    <Button onMouseEnter={()=>{
       window.dispatchEvent(new CustomEvent("leftButtonClicked"));
     }} onMouseUp={()=>{
       window.dispatchEvent(new CustomEvent("leftButtonUp"));
@@ -80,7 +85,7 @@ function GameComponent() {
     </GridItem>
   
     <GridItem colSpan={1} textAlign={"center"}>
-    <Button onMouseDown={()=>{
+    <Button onMouseEnter={()=>{
       window.dispatchEvent(new CustomEvent("rightButtonClicked"));
     }} onMouseUp={()=>{
       window.dispatchEvent(new CustomEvent("rightButtonUp"));
@@ -92,6 +97,25 @@ function GameComponent() {
     <GridItem colSpan={1} textAlign={"center"}></GridItem>
     <GridItem colSpan={1} textAlign={"center"}></GridItem>
     </Grid>
+    
+    <Button onClick={onOpen}>Open Modal</Button>
+
+      <Modal isOpen={isGameOvered} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Game Over</ModalHeader>
+          <ModalBody>
+            <h2>Score {$score.get()}</h2>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button colorScheme='blue' mr={3} onClick={onClose}>
+              Close
+            </Button>
+            <Button variant='ghost'>Secondary Action</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Container> </>
   )
 }
