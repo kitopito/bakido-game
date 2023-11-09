@@ -107,24 +107,22 @@ function GameComponent() {
     <GridItem colSpan={1} textAlign={"center"}></GridItem>
     </Grid>
     
-    <Button onClick={onOpen}>Open Modal</Button>
+    <Modal isOpen={isGameOvered} onClose={onClose}>
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>Game Over</ModalHeader>
+        <ModalBody>
+          <h2>Score {score}</h2>
+        </ModalBody>
 
-      <Modal isOpen={isGameOvered} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Game Over</ModalHeader>
-          <ModalBody>
-            <h2>Score {score}</h2>
-          </ModalBody>
-
-          <ModalFooter>
-            <Button colorScheme='blue' mr={3} onClick={onClose}>
-              Close
-            </Button>
-            <Button variant='ghost'>Secondary Action</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+        <ModalFooter>
+          <Button colorScheme='blue' mr={3} onClick={onClose}>
+            Close
+          </Button>
+          <Button variant='ghost'>Secondary Action</Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
     </Container> </>
   )
 }

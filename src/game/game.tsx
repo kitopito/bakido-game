@@ -155,7 +155,7 @@ export class GameScene extends Phaser.Scene {
           console.log("Sensor当たったナリ");
           this.matter.world.pause();
           console.log("当たった");
-          this.scoreText?.setText('Game Over Score: ' + this.score);
+          this.scoreText?.setText('Score: ' + this.score);
           window.dispatchEvent(new CustomEvent("setScore", {detail: this.score}));
           console.log("ナリ");
           this.isKeyboardEnable = false;
