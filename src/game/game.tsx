@@ -1,6 +1,6 @@
 import Phaser, { GameObjects } from "phaser";
 import { images } from "./images";
-import { $isGameOvered, $score } from "../state/state";
+//import { $isGameOvered, $score } from "../state/state";
 
 var paddle: Phaser.Physics.Matter.Image;
 const fishPhaseMap = new Map<Phaser.Physics.Matter.Image, number>();
@@ -16,6 +16,7 @@ export class GameScene extends Phaser.Scene {
 
   private maxPhase: number = 8;
   private scoreText?: Phaser.GameObjects.Text; 
+  private score: number = 0;
 
   private items?: Phaser.GameObjects.Group;
   private fishY: number = 150;
@@ -85,9 +86,11 @@ export class GameScene extends Phaser.Scene {
 
     this.scoreText = this.add.text(
       10, 16, 'Score: 0', { fontSize: '32px', color: '#000000'});
+    /*
     $score.subscribe(score => {
       this.scoreText?.setText('Score: ' + score);
     })
+    */
 
     paddle = this.matter.add.image(
 //      canvas.width / 2, 60, "paddle");
@@ -149,11 +152,15 @@ export class GameScene extends Phaser.Scene {
         const isSensor = rootBodyA.isSensor || rootBodyB.isSensor;
         if(isSensor) {
           // Game Over
-//          console.log("Sensor当たったナリ");
+          console.log("Sensor当たったナリ");
           this.matter.world.pause();
-          this.scoreText?.setText('Game Over Score: ' + $score);
+          console.log("当たった");
+          this.scoreText?.setText('Game Over Score: ' + this.score);
+          window.dispatchEvent(new CustomEvent("setScore", {detail: this.score}));
+          console.log("ナリ");
           this.isKeyboardEnable = false;
-          $isGameOvered.set(true);
+//          $isGameOvered.set(true);
+          window.dispatchEvent(new CustomEvent("gameOvered"));
         }
 
 //        console.log("魚判定");
@@ -191,10 +198,12 @@ export class GameScene extends Phaser.Scene {
             }
 
             console.log("スコア足す前");
-            console.log($score.get());
-            $score.set($score.get() + Math.pow(2, phase));
+//            console.log($score.get());
+//            $score.set($score.get() + Math.pow(2, phase));
+            this.score += Math.pow(2, phase);
+            this.scoreText?.setText('Score: ' + this.score);
             console.log("スコア足す後");
-            console.log($score.get());
+//            console.log($score.get());
           }
         }
       })
@@ -208,6 +217,7 @@ export class GameScene extends Phaser.Scene {
 //    this.physics.collide(ball, paddle)
     if((this.KeyLeft?.isDown || this.isLeftButtonPressed) && this.isKeyboardEnable) {
 //      console.log("←押された");
+      console.log("keyboad enable " + this.isKeyboardEnable);
       if(paddle.x - 5 > 0) {
         paddle.x += -5;
   //      this.currentFish!.x += -5;

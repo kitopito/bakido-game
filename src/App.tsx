@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { GameScene, gameConfig } from './game/game'
 import { Button, Center, Container, Flex, Grid, GridItem, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Spacer, useDisclosure } from '@chakra-ui/react';
-import { $isGameOvered, $score } from './state/state';
+//import { $isGameOvered, $score } from './state/state';
 import { useStore } from '@nanostores/react'
 
 function GameComponent() {
@@ -10,7 +10,16 @@ function GameComponent() {
   const [screenHeight, setScreenHeight] = useState(400);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const isGameOvered = useStore($isGameOvered);
+//  const isGameOvered = useStore($isGameOvered);
+  const [isGameOvered, setIsGameOverd] = useState(false);
+  window.addEventListener("gameOvered", (event) => {
+    setIsGameOverd(true);
+  });
+  const [score, setScore] = useState(0);
+  window.addEventListener("setScore", (event) => {
+    setScore((event as CustomEvent).detail);
+    console.log("スコアセット");
+  });
 
   const sw = document.body.clientWidth;
 //  const sw = document.documentElement.clientWidth;
@@ -105,7 +114,7 @@ function GameComponent() {
         <ModalContent>
           <ModalHeader>Game Over</ModalHeader>
           <ModalBody>
-            <h2>Score {$score.get()}</h2>
+            <h2>Score {score}</h2>
           </ModalBody>
 
           <ModalFooter>
