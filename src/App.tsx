@@ -77,12 +77,12 @@ function GameComponent() {
     </Center>
 
     {_isMobile //|| true
-    ? <Grid templateColumns='repeat(7, 1fr)' gap={4} margin={"12px"}>
+    ? <Grid templateColumns='repeat(7, 1fr)' gap={4} margin={"10px"}>
       <GridItem colSpan={1} textAlign={"center"}></GridItem>
       <GridItem colSpan={1} textAlign={"center"}></GridItem>
 
       <GridItem colSpan={1} textAlign={"center"}>
-      <Button fontSize={"40px"} height={"70px"}
+      <Button fontSize={"20px"} height={"50px"}
         onTouchStart={()=>{
           window.dispatchEvent(new CustomEvent("leftButtonClicked"));
         }} 
@@ -96,7 +96,7 @@ function GameComponent() {
       </GridItem>
 
       <GridItem colSpan={1} textAlign={"center"}>
-      <Button fontSize={"40px"} height={"70px"}
+      <Button fontSize={"20px"} height={"50px"}
         onClick={()=>{
           window.dispatchEvent(new CustomEvent("fallButtonClicked"));
         }}
@@ -104,7 +104,7 @@ function GameComponent() {
       </GridItem>
     
       <GridItem colSpan={1} textAlign={"center"}>
-      <Button fontSize={"40px"} height={"70px"}
+      <Button fontSize={"20px"} height={"50px"}
         onTouchStart={()=>{
           window.dispatchEvent(new CustomEvent("rightButtonClicked"));
         }} 
