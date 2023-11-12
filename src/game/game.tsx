@@ -132,6 +132,7 @@ export class GameScene extends Phaser.Scene {
     fishPhaseMap.set(this.nextFish, rand);
        
     this.matter.world.on("collisionstart", (event: Phaser.Physics.Matter.Events.CollisionStartEvent) => {
+      console.log("こりじょん");
       event.pairs.forEach(pair => {
         const { bodyA, bodyB } = pair;
 //        console.log(pair);
@@ -149,20 +150,6 @@ export class GameScene extends Phaser.Scene {
         const isItem2Fish = fishPhaseMap.get(object2) != undefined;
         const isFishCollision = isItem1Fish && isItem2Fish;
             
-        const isSensor = rootBodyA.isSensor || rootBodyB.isSensor;
-        if(isSensor) {
-          // Game Over
-          console.log("Sensor当たったナリ");
-          this.matter.world.pause();
-          console.log("当たった");
-          this.scoreText?.setText('Score: ' + this.score);
-          window.dispatchEvent(new CustomEvent("setScore", {detail: this.score}));
-          console.log("ナリ");
-          this.isKeyboardEnable = false;
-//          $isGameOvered.set(true);
-          window.dispatchEvent(new CustomEvent("gameOvered"));
-        }
-
 //        console.log("魚判定");
 //        console.log(fishPhaseMap);
 //        console.log(isItem1Fish);
@@ -206,6 +193,30 @@ export class GameScene extends Phaser.Scene {
 //            console.log($score.get());
           }
         }
+
+        const isSensor = rootBodyA.isSensor || rootBodyB.isSensor;
+        if(isSensor) {
+          // Game Over
+          console.log("Sensor当たったナリ");
+          console.log(rootBodyA);
+          console.log(rootBodyB);
+          this.matter.world.off("collisionstart");
+          this.matter.world.removeAllListeners("collisionstart");
+          this.matter.world.on('pause', ()=>{
+            console.log("当たった");
+  //          this.scoreText?.setText('Score: ' + this.score);
+            console.log("setText" + this.score.toString());
+            window.dispatchEvent(new CustomEvent("setScore", {detail: this.score}));
+            console.log("ナリ");
+            this.isKeyboardEnable = false;
+            console.log("キーボード enable " + this.isKeyboardEnable);
+  //          $isGameOvered.set(true);
+            window.dispatchEvent(new CustomEvent("gameOvered"));
+            console.log("ゲームオーバー");
+          });
+          this.matter.world.pause();
+        }
+
       })
     });
     
@@ -274,6 +285,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private createFish(phase: number): Phaser.Physics.Matter.Image {
+    console.log("create ふぃっしゅ");
     let status: string = '';
     let scale: number = 1;
     let newFish;

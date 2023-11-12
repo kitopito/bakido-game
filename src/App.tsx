@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { GameScene, gameConfig } from './game/game'
-import { Button, Center, Container, Flex, Grid, GridItem, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Spacer, useDisclosure } from '@chakra-ui/react';
+import { Button, Center, Container, Flex, Grid, GridItem, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Spacer, Text, useDisclosure } from '@chakra-ui/react';
 //import { $isGameOvered, $score } from './state/state';
 import { useStore } from '@nanostores/react'
+import isMobile from "ismobilejs"
 
 function GameComponent() {
   const [isReady, setReady] = useState(false);
@@ -18,9 +19,10 @@ function GameComponent() {
   const [score, setScore] = useState(0);
   window.addEventListener("setScore", (event) => {
     setScore((event as CustomEvent).detail);
-    console.log("スコアセット");
+    console.log("スコアセット " + (event as CustomEvent).detail.toString());
   });
 
+  const _isMobile = isMobile(window.navigator).any;
   const sw = document.body.clientWidth;
 //  const sw = document.documentElement.clientWidth;
   console.log(sw);
@@ -73,39 +75,41 @@ function GameComponent() {
     <div id="phaser-game" className={isReady ? "visible" : "invisible"} />
     </Center>
 
-    <Grid templateColumns='repeat(7, 1fr)' gap={4}>
-    <GridItem colSpan={1} textAlign={"center"}></GridItem>
-    <GridItem colSpan={1} textAlign={"center"}></GridItem>
+    {_isMobile || true
+    ? <Grid templateColumns='repeat(7, 1fr)' gap={4}>
+      <GridItem colSpan={1} textAlign={"center"}></GridItem>
+      <GridItem colSpan={1} textAlign={"center"}></GridItem>
 
-    <GridItem colSpan={1} textAlign={"center"}>
-    <Button onMouseEnter={()=>{
-      window.dispatchEvent(new CustomEvent("leftButtonClicked"));
-    }} onMouseUp={()=>{
-      window.dispatchEvent(new CustomEvent("leftButtonUp"));
-    }} onMouseLeave={()=>{
-      window.dispatchEvent(new CustomEvent("leftButtonUp"));
-    }}>left</Button>
-    </GridItem>
+      <GridItem colSpan={1} textAlign={"center"}>
+      <Button onTouchStart={()=>{
+        window.dispatchEvent(new CustomEvent("leftButtonClicked"));
+      }} onTouchEnd={()=>{
+        window.dispatchEvent(new CustomEvent("leftButtonUp"));
+      }} onTouchCancel={()=>{
+        window.dispatchEvent(new CustomEvent("leftButtonUp"));
+      }}>left</Button>
+      </GridItem>
 
-    <GridItem colSpan={1} textAlign={"center"}>
-    <Button onClick={()=>{
-      window.dispatchEvent(new CustomEvent("fallButtonClicked"));
-    }}>fall</Button>
-    </GridItem>
-  
-    <GridItem colSpan={1} textAlign={"center"}>
-    <Button onMouseEnter={()=>{
-      window.dispatchEvent(new CustomEvent("rightButtonClicked"));
-    }} onMouseUp={()=>{
-      window.dispatchEvent(new CustomEvent("rightButtonUp"));
-    }} onMouseLeave={()=>{
-      window.dispatchEvent(new CustomEvent("rightButtonUp"));
-    }}>right</Button>
-    </GridItem>
+      <GridItem colSpan={1} textAlign={"center"}>
+      <Button onClick={()=>{
+        window.dispatchEvent(new CustomEvent("fallButtonClicked"));
+      }}>fall</Button>
+      </GridItem>
+    
+      <GridItem colSpan={1} textAlign={"center"}>
+      <Button onTouchStart={()=>{
+        window.dispatchEvent(new CustomEvent("rightButtonClicked"));
+      }} onTouchEnd={()=>{
+        window.dispatchEvent(new CustomEvent("rightButtonUp"));
+      }} onTouchCancel={()=>{
+        window.dispatchEvent(new CustomEvent("rightButtonUp"));
+      }}>right</Button>
+      </GridItem>
 
-    <GridItem colSpan={1} textAlign={"center"}></GridItem>
-    <GridItem colSpan={1} textAlign={"center"}></GridItem>
-    </Grid>
+      <GridItem colSpan={1} textAlign={"center"}></GridItem>
+      <GridItem colSpan={1} textAlign={"center"}></GridItem>
+      </Grid>
+    : <Center><Text>矢印ボタンで移動　スペースで落下</Text></Center>}
     
     <Modal isOpen={isGameOvered} onClose={onClose}>
       <ModalOverlay />
