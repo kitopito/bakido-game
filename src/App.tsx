@@ -31,6 +31,7 @@ function GameComponent() {
 
   useEffect(() => {
      // Nothing really special here... Your phaser3 config should work just fine.  
+    console.log("useEffect中");
     let config = {
       type: Phaser.AUTO,
       width: 800,
@@ -57,7 +58,7 @@ function GameComponent() {
      // Triggered when game is fully visible.
      game.events.on('putOnGameScene', setReady)
      // Add your scene/s here (or in `scene` key of `config`).
-     game.scene.add("GameScene", GameScene, true)
+//     game.scene.add("GameScene", GameScene, true)
      // If you don't do this, you get duplicates of the canvas piling up
      // everytime this component renders. 
      return () => {
@@ -76,34 +77,44 @@ function GameComponent() {
     </Center>
 
     {_isMobile || true
-    ? <Grid templateColumns='repeat(7, 1fr)' gap={4}>
+    ? <Grid templateColumns='repeat(7, 1fr)' gap={4} margin={"12px"}>
       <GridItem colSpan={1} textAlign={"center"}></GridItem>
       <GridItem colSpan={1} textAlign={"center"}></GridItem>
 
       <GridItem colSpan={1} textAlign={"center"}>
-      <Button onTouchStart={()=>{
-        window.dispatchEvent(new CustomEvent("leftButtonClicked"));
-      }} onTouchEnd={()=>{
-        window.dispatchEvent(new CustomEvent("leftButtonUp"));
-      }} onTouchCancel={()=>{
-        window.dispatchEvent(new CustomEvent("leftButtonUp"));
-      }}>left</Button>
+      <Button fontSize={"40px"} height={"70px"}
+        onTouchStart={()=>{
+          window.dispatchEvent(new CustomEvent("leftButtonClicked"));
+        }} 
+        onTouchEnd={()=>{
+          window.dispatchEvent(new CustomEvent("leftButtonUp"));
+        }} 
+        onTouchCancel={()=>{
+          window.dispatchEvent(new CustomEvent("leftButtonUp"));
+        }}
+      >シモ</Button>
       </GridItem>
 
       <GridItem colSpan={1} textAlign={"center"}>
-      <Button onClick={()=>{
-        window.dispatchEvent(new CustomEvent("fallButtonClicked"));
-      }}>fall</Button>
+      <Button fontSize={"40px"} height={"70px"}
+        onClick={()=>{
+          window.dispatchEvent(new CustomEvent("fallButtonClicked"));
+        }}
+      >ラク</Button>
       </GridItem>
     
       <GridItem colSpan={1} textAlign={"center"}>
-      <Button onTouchStart={()=>{
-        window.dispatchEvent(new CustomEvent("rightButtonClicked"));
-      }} onTouchEnd={()=>{
-        window.dispatchEvent(new CustomEvent("rightButtonUp"));
-      }} onTouchCancel={()=>{
-        window.dispatchEvent(new CustomEvent("rightButtonUp"));
-      }}>right</Button>
+      <Button fontSize={"40px"} height={"70px"}
+        onTouchStart={()=>{
+          window.dispatchEvent(new CustomEvent("rightButtonClicked"));
+        }} 
+        onTouchEnd={()=>{
+          window.dispatchEvent(new CustomEvent("rightButtonUp"));
+        }} 
+        onTouchCancel={()=>{
+          window.dispatchEvent(new CustomEvent("rightButtonUp"));
+        }}
+      >カミ</Button>
       </GridItem>
 
       <GridItem colSpan={1} textAlign={"center"}></GridItem>

@@ -46,6 +46,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   create() {
+    console.log("create中");
     window.addEventListener("leftButtonClicked", (event) => {
       this.isLeftButtonPressed = true;
     });
@@ -81,6 +82,7 @@ export class GameScene extends Phaser.Scene {
       isSensor: true,
       friction: 0
     });
+    console.log(this.matter.world.getAllBodies());
 
     this.add.image(400, 300, 'sky').setScale(0.5);
 
@@ -131,6 +133,7 @@ export class GameScene extends Phaser.Scene {
     this.nextFish.setBounce(0.5);
     fishPhaseMap.set(this.nextFish, rand);
        
+    console.log(this.matter.world.getAllBodies());
     this.matter.world.on("collisionstart", (event: Phaser.Physics.Matter.Events.CollisionStartEvent) => {
       console.log("こりじょん");
       event.pairs.forEach(pair => {
@@ -200,6 +203,7 @@ export class GameScene extends Phaser.Scene {
           console.log("Sensor当たったナリ");
           console.log(rootBodyA);
           console.log(rootBodyB);
+          console.log(this.matter.world.getAllBodies());
           this.matter.world.off("collisionstart");
           this.matter.world.removeAllListeners("collisionstart");
           this.matter.world.on('pause', ()=>{
