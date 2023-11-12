@@ -3,6 +3,7 @@ import { images } from "./images";
 //import { $isGameOvered, $score } from "../state/state";
 
 var paddle: Phaser.Physics.Matter.Image;
+const paddleSpeed: number = 10;
 const fishPhaseMap = new Map<Phaser.Physics.Matter.Image, number>();
 
 export class GameScene extends Phaser.Scene {
@@ -233,8 +234,8 @@ export class GameScene extends Phaser.Scene {
     if((this.KeyLeft?.isDown || this.isLeftButtonPressed) && this.isKeyboardEnable) {
 //      console.log("←押された");
       console.log("keyboad enable " + this.isKeyboardEnable);
-      if(paddle.x - 5 > 0) {
-        paddle.x += -5;
+      if(paddle.x - paddleSpeed > 0) {
+        paddle.x += -paddleSpeed;
   //      this.currentFish!.x += -5;
         this.currentFish!.x = paddle.x;
       }
@@ -244,8 +245,8 @@ export class GameScene extends Phaser.Scene {
 
     if((this.KeyRight?.isDown || this.isRightButtonPressed) && this.isKeyboardEnable) {
 //      console.log("→押された");
-      if(paddle.x + 5 < this.canvas!.width) {
-        paddle.x += +5;
+      if(paddle.x + paddleSpeed < this.canvas!.width) {
+        paddle.x += +paddleSpeed;
   //      this.currentFish!.x += +5;
         this.currentFish!.x = paddle.x;
       }
