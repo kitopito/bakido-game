@@ -76,7 +76,7 @@ function GameComponent() {
     <div id="phaser-game" className={isReady ? "visible" : "invisible"} />
     </Center>
 
-    {_isMobile || true
+    {_isMobile //|| true
     ? <Grid templateColumns='repeat(7, 1fr)' gap={4} margin={"12px"}>
       <GridItem colSpan={1} textAlign={"center"}></GridItem>
       <GridItem colSpan={1} textAlign={"center"}></GridItem>
