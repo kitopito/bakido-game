@@ -1,10 +1,14 @@
 import Phaser, { GameObjects } from "phaser";
 import { images } from "./images";
+import { $screenHeight, $screenWidth } from "../state/state";
 //import { $isGameOvered, $score } from "../state/state";
 
 var paddle: Phaser.Physics.Matter.Image;
 const paddleSpeed: number = 10;
 const fishPhaseMap = new Map<Phaser.Physics.Matter.Image, number>();
+
+//let screenHeight: number;
+//let screenWidth: number;
 
 export class GameScene extends Phaser.Scene {
   private KeyLeft?: Phaser.Input.Keyboard.Key;
@@ -14,15 +18,22 @@ export class GameScene extends Phaser.Scene {
   private isLeftButtonPressed: boolean = false;
   private isRightButtonPressed: boolean = false;
   private isFallButtonPressed: boolean = false;
+  
+//  screenHeight = $screenHeight.get();
+//  screenWidth = $screenWidth.get();
+//  private spacer = screenHeight * 0.2;
+  private sh = document.body.clientHeight;
+  private sw = document.body.clientWidth;
+  private spacer = this.sh * 0.2;
 
   private maxPhase: number = 8;
   private scoreText?: Phaser.GameObjects.Text; 
   private score: number = 0;
 
   private items?: Phaser.GameObjects.Group;
-  private fishY: number = 150;
-  private nextCircleX: number = 750;
-  private nextCircleY: number = 50;
+  private fishY: number = this.spacer + 150;
+  private nextCircleX: number = 720;
+  private nextCircleY: number = 80;
   
   private currentFish?: Phaser.Physics.Matter.Image;
   private nextFish?: Phaser.Physics.Matter.Image;
@@ -35,7 +46,7 @@ export class GameScene extends Phaser.Scene {
   preload() {
     this.canvas = this.sys.game.canvas;
 
-    this.load.image('sky', '/graph.png');
+    this.load.image('background', '/graph.png');
     this.load.image('logo', '/obake.png');
 
 //    this.load.image('ball', '/vite.svg');
@@ -66,29 +77,29 @@ export class GameScene extends Phaser.Scene {
     
     const canvas = this.sys.game.canvas;
 
-    const floor = this.matter.add.rectangle(400, 575, 800, 50, {
+    const floor = this.matter.add.rectangle(400, this.spacer + 575, 800, 50, {
       isStatic: true,
       friction: 0
     });
-    const leftWall = this.matter.add.rectangle(-25, 400, 50, 800, {
+    const leftWall = this.matter.add.rectangle(-25, this.spacer + 400, 50, 800, {
       isStatic: true,
       friction: 0
     });
-    const rightWall = this.matter.add.rectangle(825, 400, 50, 800, {
+    const rightWall = this.matter.add.rectangle(825, this.spacer + 400, 50, 800, {
       isStatic: true,
       friction: 0
     });
-    const glassCeiling = this.matter.add.rectangle(400, 20, 800, 50, {
+    const glassCeiling = this.matter.add.rectangle(400, this.spacer + 20, 800, 50, {
       isStatic: true,
       isSensor: true,
       friction: 0
     });
     console.log(this.matter.world.getAllBodies());
 
-    this.add.image(400, 300, 'sky').setScale(0.5);
+    this.add.image(400, this.spacer + 300, 'background').setScale(0.5);
 
     this.scoreText = this.add.text(
-      10, 16, 'Score: 0', { fontSize: '32px', color: '#000000'});
+      10, this.spacer + 16, 'Score: 0', { fontSize: '32px', color: '#000000'});
     /*
     $score.subscribe(score => {
       this.scoreText?.setText('Score: ' + score);
@@ -101,7 +112,7 @@ export class GameScene extends Phaser.Scene {
     paddle.setStatic(true);
     paddle.setScale(0.4);
 //    paddle.setOrigin(0);
-    paddle.setPosition(400,70);
+    paddle.setPosition(400, this.spacer + 70);
     paddle.setIgnoreGravity(true);
 //    console.log(paddle.originX);
     paddle.setCollisionGroup(-1); // unable collision

@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { GameScene, gameConfig } from './game/game'
-import { Button, Center, Container, Flex, Grid, GridItem, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Spacer, Text, useDisclosure } from '@chakra-ui/react';
+import { Button, Center, Container, Flex, Grid, GridItem, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Spacer, Text, background, useDisclosure } from '@chakra-ui/react';
 //import { $isGameOvered, $score } from './state/state';
 import { useStore } from '@nanostores/react'
 import isMobile from "ismobilejs"
+import { getConfig } from './game/config';
+import { $screenHeight, $screenWidth } from './state/state';
+
+let game: Phaser.Game;
 
 function GameComponent() {
   const [isReady, setReady] = useState(false);
@@ -28,33 +32,15 @@ function GameComponent() {
   console.log(sw);
   const sh = document.body.clientHeight;
   console.log(sh);
-
+  const spacer = sh * 0.2;
+  
   useEffect(() => {
      // Nothing really special here... Your phaser3 config should work just fine.  
     console.log("useEffect中");
-    let config = {
-      type: Phaser.AUTO,
-      width: 800,
-      height: 600,
-      scene: GameScene,
-      scale: {
-        parent: "phaser-game",
-        mode: Phaser.Scale.FIT,
-        autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
-      },
-      physics: {
-        default: 'matter',
-        matter: {
-          gravity: { y: 1 },
-          debug: true
-        },
-        arcade: {
-        //      gravity: { y: 200 }
-        }
-      }
-    }
+    $screenHeight.set(sh);
+    $screenWidth.set(sw);
 
-     let game = new Phaser.Game(config)
+     /*let */game = new Phaser.Game(getConfig(spacer));
      // Triggered when game is fully visible.
      game.events.on('putOnGameScene', setReady)
      // Add your scene/s here (or in `scene` key of `config`).
@@ -72,8 +58,15 @@ function GameComponent() {
   return (
     <> <Container w={sw} maxWidth={"2000px"} h={sh} maxHeight={"2000px"}>
 
+{/*
+    <Container height={sh * 0.2}></Container>
+*/}
+
     <Center>
     <div id="phaser-game" className={isReady ? "visible" : "invisible"} />
+{/*
+    <Container id="phaser-game" className={isReady ? "visible" : "invisible"} marginX={0}/>
+*/}
     </Center>
 
     {_isMobile //|| true
@@ -122,17 +115,26 @@ function GameComponent() {
       </Grid>
     : <Center><Text>矢印ボタンで移動　スペースで落下</Text></Center>}
     
-    <Modal isOpen={isGameOvered} onClose={onClose}>
-      <ModalOverlay />
-      <ModalContent>
+    <Modal isOpen={isGameOvered} onClose={onClose} colorScheme='blue'>
+      <ModalOverlay/>
+      <Container height={sh * 0.2}></Container>
+      <ModalContent marginTop={sh * 0.35}>
         <ModalHeader>Game Over</ModalHeader>
         <ModalBody>
           <h2>Score {score}</h2>
         </ModalBody>
 
         <ModalFooter>
-          <Button colorScheme='blue' mr={3} onClick={onClose}>
-            Close
+          <Button colorScheme='blue' mr={3} onClick={()=>{
+//            setReady(false);
+            game.destroy(true);
+            game = new Phaser.Game(getConfig(spacer));
+            game.events.on('putOnGameScene', setReady);
+            //     game.scene.add("GameScene", GameScene, true)
+//            setReady(true);
+            setIsGameOverd(false);
+          }}>
+            retry
           </Button>
           <Button variant='ghost'>Secondary Action</Button>
         </ModalFooter>
