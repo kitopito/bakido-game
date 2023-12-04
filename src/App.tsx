@@ -5,7 +5,7 @@ import { Button, Center, Container, Flex, Grid, GridItem, Modal, ModalBody, Moda
 import { useStore } from '@nanostores/react'
 import isMobile from "ismobilejs"
 import { getConfig } from './game/config';
-import { $screenHeight, $screenWidth } from './state/state';
+import { $gravityY, $screenHeight, $screenWidth } from './state/state';
 
 let game: Phaser.Game;
 
@@ -29,9 +29,9 @@ function GameComponent() {
   const _isMobile = isMobile(window.navigator).any;
   const sw = document.body.clientWidth;
 //  const sw = document.documentElement.clientWidth;
-  console.log(sw);
+  console.log("screenWidth = " + sw.toString());
   const sh = document.body.clientHeight;
-  console.log(sh);
+  console.log("screenHeight = " + sh.toString());
   const spacer = sh * 0.2;
   
   useEffect(() => {
@@ -114,6 +114,12 @@ function GameComponent() {
       <GridItem colSpan={1} textAlign={"center"}></GridItem>
       </Grid>
     : <Center><Text>矢印ボタンで移動　スペースで落下</Text></Center>}
+
+{/*
+*/}
+    {_isMobile //|| true
+    ? <GravityButtonsMobile></GravityButtonsMobile>
+    : <GravityButtonsPC></GravityButtonsPC>}
     
     <Modal isOpen={isGameOvered} onClose={onClose} colorScheme='blue'>
       <ModalOverlay/>
@@ -127,12 +133,15 @@ function GameComponent() {
         <ModalFooter>
           <Button colorScheme='blue' mr={3} onClick={()=>{
 //            setReady(false);
+            /*
             game.destroy(true);
             game = new Phaser.Game(getConfig(spacer));
             game.events.on('putOnGameScene', setReady);
             //     game.scene.add("GameScene", GameScene, true)
 //            setReady(true);
             setIsGameOverd(false);
+            */
+            window.location.reload();
           }}>
             retry
           </Button>
@@ -145,3 +154,94 @@ function GameComponent() {
 }
 
 export default GameComponent
+
+function GravityButtonsPC() {
+  return (
+    <Grid templateColumns='repeat(8, 1fr)' gap={4} marginTop={'40px'}>
+      <GridItem colSpan={2} textAlign={"center"}></GridItem>
+
+      <GridItem colSpan={1} textAlign={"center"}>
+      <Button fontSize={"14px"} height={"50px"}
+        onClick={()=>{
+          $gravityY.set(1);
+        }} 
+      >Gravity Y = 1</Button>
+      </GridItem>
+
+      <GridItem colSpan={1} textAlign={"center"}>
+      <Button fontSize={"14px"} height={"50px"}
+        onClick={()=>{
+          $gravityY.set(3);
+        }}
+      >Gravity Y = 3</Button>
+      </GridItem>
+    
+      <GridItem colSpan={1} textAlign={"center"}>
+      <Button fontSize={"14px"} height={"50px"}
+        onClick={()=>{
+          $gravityY.set(10);
+        }} 
+      >Gravity Y = 10</Button>
+      </GridItem>
+
+      <GridItem colSpan={1} textAlign={"center"}>
+      <Button fontSize={"14px"} height={"50px"}
+        onClick={()=>{
+          $gravityY.set(30);
+        }} 
+      >Gravity Y = 30</Button>
+      </GridItem>
+
+      <GridItem colSpan={2} textAlign={"center"}></GridItem>
+      </Grid>)
+}
+
+function GravityButtonsMobile() {
+  return (<>
+    <Grid templateColumns='repeat(6, 1fr)' gap={4} marginTop={'40px'}>
+      <GridItem colSpan={1} textAlign={"center"}></GridItem>
+      <GridItem colSpan={1} textAlign={"center"}></GridItem>
+
+      <GridItem colSpan={1} textAlign={"center"}>
+      <Button fontSize={"14px"} height={"50px"}
+        onClick={()=>{
+          $gravityY.set(1);
+        }} 
+      >Gravity Y =  1</Button>
+      </GridItem>
+
+      <GridItem colSpan={1} textAlign={"center"}>
+      <Button fontSize={"14px"} height={"50px"}
+        onClick={()=>{
+          $gravityY.set(3);
+        }}
+      >Gravity Y =  3</Button>
+      </GridItem>
+
+      <GridItem colSpan={1} textAlign={"center"}></GridItem>
+      <GridItem colSpan={1} textAlign={"center"}></GridItem>
+      </Grid>
+    
+    <Grid templateColumns='repeat(6, 1fr)' gap={4} marginTop={'10px'}>
+      <GridItem colSpan={2} textAlign={"center"}></GridItem>
+
+      <GridItem colSpan={1} textAlign={"center"}>
+      <Button fontSize={"14px"} height={"50px"}
+        onClick={()=>{
+          $gravityY.set(10);
+        }} 
+      >Gravity Y = 10</Button>
+      </GridItem>
+
+      <GridItem colSpan={1} textAlign={"center"}>
+      <Button fontSize={"14px"} height={"50px"}
+        onClick={()=>{
+          $gravityY.set(30);
+        }} 
+      >Gravity Y = 30</Button>
+      </GridItem>
+
+      <GridItem colSpan={2} textAlign={"center"}></GridItem>
+      </Grid>
+    </>)
+}

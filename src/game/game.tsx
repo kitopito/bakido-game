@@ -1,6 +1,6 @@
 import Phaser, { GameObjects } from "phaser";
 import { images } from "./images";
-import { $screenHeight, $screenWidth } from "../state/state";
+import { $gravityY, $screenHeight, $screenWidth } from "../state/state";
 //import { $isGameOvered, $score } from "../state/state";
 
 var paddle: Phaser.Physics.Matter.Image;
@@ -37,7 +37,9 @@ export class GameScene extends Phaser.Scene {
   
   private currentFish?: Phaser.Physics.Matter.Image;
   private nextFish?: Phaser.Physics.Matter.Image;
+  private lastFish?: Phaser.Physics.Matter.Image;
 //  private nextFish?: Phaser.GameObjects.Sprite;
+  private lastFishFirstCollisionExist = true;
   
   private isKeyboardEnable = true;
   
@@ -45,6 +47,10 @@ export class GameScene extends Phaser.Scene {
 
   preload() {
     this.canvas = this.sys.game.canvas;
+    this.matter.world.setGravity(0, $gravityY.get());
+    $gravityY.subscribe((value) => {
+      this.matter.world.setGravity(0, value);
+    });
 
     this.load.image('background', '/graph.png');
     this.load.image('logo', '/obake.png');
@@ -77,7 +83,7 @@ export class GameScene extends Phaser.Scene {
     
     const canvas = this.sys.game.canvas;
 
-    const floor = this.matter.add.rectangle(400, this.spacer + 575, 800, 50, {
+    const floor = this.matter.add.rectangle(400, this.spacer + 575 + 50, 800, 50, {
       isStatic: true,
       friction: 0
     });
@@ -89,22 +95,24 @@ export class GameScene extends Phaser.Scene {
       isStatic: true,
       friction: 0
     });
-    const glassCeiling = this.matter.add.rectangle(400, this.spacer + 20, 800, 50, {
+    const glassCeiling = this.matter.add.rectangle(400, this.spacer + 20 - 50, 800, 50, {
       isStatic: true,
       isSensor: true,
       friction: 0
     });
-    console.log(this.matter.world.getAllBodies());
+//    console.log(this.matter.world.getAllBodies());
 
     this.add.image(400, this.spacer + 300, 'background').setScale(0.5);
 
     this.scoreText = this.add.text(
-      10, this.spacer + 16, 'Score: 0', { fontSize: '32px', color: '#000000'});
+      this.nextCircleX - 26, 16, 'next', { fontSize: '16px', color: '#000000'});
     /*
     $score.subscribe(score => {
       this.scoreText?.setText('Score: ' + score);
     })
     */
+    this.scoreText = this.add.text(
+      10, 32, 'Score: 0', { fontSize: '32px', color: '#000000'});
 
     paddle = this.matter.add.image(
 //      canvas.width / 2, 60, "paddle");
@@ -145,7 +153,7 @@ export class GameScene extends Phaser.Scene {
     this.nextFish.setBounce(0.5);
     fishPhaseMap.set(this.nextFish, rand);
        
-    console.log(this.matter.world.getAllBodies());
+//    console.log(this.matter.world.getAllBodies());
     this.matter.world.on("collisionstart", (event: Phaser.Physics.Matter.Events.CollisionStartEvent) => {
       console.log("こりじょん");
       event.pairs.forEach(pair => {
@@ -165,12 +173,16 @@ export class GameScene extends Phaser.Scene {
         const isItem2Fish = fishPhaseMap.get(object2) != undefined;
         const isFishCollision = isItem1Fish && isItem2Fish;
             
+        if(object1 == this.lastFish || object2 == this.lastFish) {
+          this.lastFishFirstCollisionExist = true;
+        }
 //        console.log("魚判定");
 //        console.log(fishPhaseMap);
 //        console.log(isItem1Fish);
 //        console.log(isItem2Fish);
         if(isFishCollision) {
 //          console.log("サカナぶつかり中");
+//          console.log(this.lastFishFirstCollisionExist);
           const fish1 = rootBodyA.gameObject as Phaser.Physics.Matter.Image;
           const fish2 = rootBodyB.gameObject as Phaser.Physics.Matter.Image;
 
@@ -199,12 +211,12 @@ export class GameScene extends Phaser.Scene {
               fishPhaseMap.set(newFish, phase + 1);
             }
 
-            console.log("スコア足す前");
+//            console.log("スコア足す前");
 //            console.log($score.get());
 //            $score.set($score.get() + Math.pow(2, phase));
             this.score += Math.pow(2, phase);
             this.scoreText?.setText('Score: ' + this.score);
-            console.log("スコア足す後");
+//            console.log("スコア足す後");
 //            console.log($score.get());
           }
         }
@@ -215,17 +227,17 @@ export class GameScene extends Phaser.Scene {
           console.log("Sensor当たったナリ");
           console.log(rootBodyA);
           console.log(rootBodyB);
-          console.log(this.matter.world.getAllBodies());
+//          console.log(this.matter.world.getAllBodies());
           this.matter.world.off("collisionstart");
           this.matter.world.removeAllListeners("collisionstart");
           this.matter.world.on('pause', ()=>{
-            console.log("当たった");
+//            console.log("当たった");
   //          this.scoreText?.setText('Score: ' + this.score);
             console.log("setText" + this.score.toString());
             window.dispatchEvent(new CustomEvent("setScore", {detail: this.score}));
             console.log("ナリ");
             this.isKeyboardEnable = false;
-            console.log("キーボード enable " + this.isKeyboardEnable);
+//            console.log("キーボード enable " + this.isKeyboardEnable);
   //          $isGameOvered.set(true);
             window.dispatchEvent(new CustomEvent("gameOvered"));
             console.log("ゲームオーバー");
@@ -265,13 +277,16 @@ export class GameScene extends Phaser.Scene {
 //      console.log(this.currentFish!.x);
 //      paddle.setPosition(paddle.x+5, paddle.y);
     }
-    if((Phaser.Input.Keyboard.JustDown(this.KeySpace!) || this.isFallButtonPressed) && this.isKeyboardEnable) {
+    if((Phaser.Input.Keyboard.JustDown(this.KeySpace!) || this.isFallButtonPressed) && this.isKeyboardEnable && this.lastFishFirstCollisionExist) {
       this.isFallButtonPressed = false;
-      console.log("スペースキー押された");
+      this.lastFishFirstCollisionExist = false;
+
+//      console.log("スペースキー押された");
       this.currentFish?.setStatic(false);
       this.currentFish?.setIgnoreGravity(false);
       this.currentFish?.setCollisionGroup(1); // enable collision
       this.currentFish?.setCollidesWith(-1); // enable collision
+      this.lastFish = this.currentFish;
 
       const rand: number = getRandomInt(0, 4);
       this.currentFish = this.nextFish;
@@ -301,7 +316,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private createFish(phase: number): Phaser.Physics.Matter.Image {
-    console.log("create ふぃっしゅ");
+//    console.log("create ふぃっしゅ");
     let status: string = '';
     let scale: number = 1;
     let newFish;
